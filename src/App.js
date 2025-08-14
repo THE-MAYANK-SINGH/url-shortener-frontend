@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
+
 export default function App() {
   const [longUrl, setLongUrl] = useState('');
   const [shortUrl, setShortUrl] = useState('');
@@ -7,21 +9,29 @@ export default function App() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const res = await fetch('http://localhost:5001/api/shorten', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: longUrl })
-    });
-    const data = await res.json();
-    setShortUrl(data.shortUrl);
-    setLongUrl('');
-    fetchAdminData();
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/shorten`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: longUrl })
+      });
+      const data = await res.json();
+      setShortUrl(data.shortUrl);
+      setLongUrl('');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Error shortening URL:', error);
+    }
   };
 
   const fetchAdminData = async () => {
-    const res = await fetch('http://localhost:5001/api/admin');
-    const data = await res.json();
-    setAdminData(data);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/admin`);
+      const data = await res.json();
+      setAdminData(data);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+    }
   };
 
   useEffect(() => {
